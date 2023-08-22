@@ -41,7 +41,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAll(int userId) {
-        List<Item> items = itemRepository.getAll(userId);
+        List<Item> items = itemRepository.getAllUsersItems(userId);
         List<ItemDto> itemsDto = new ArrayList<>();
         for (Item item : items) {
             itemsDto.add(itemMapper.convert(item));
@@ -72,7 +72,7 @@ public class ItemServiceImpl implements ItemService {
         checkId(userId);
         User user = userRepository.getUser(userId) // Проверка существования пользователя
                 .orElseThrow(() -> new NotFoundException(String.format("User № %d not found", userId)));
-        if (itemRepository.getUsersItems(userId).contains(id)) { // проверка принадлежности предмета к пользователю
+        if (itemRepository.getUsersItemsId(userId).contains(id)) { // проверка принадлежности предмета к пользователю
             Item item = itemRepository.update(id, userId, itemMapper.convert(itemDto));
             return itemMapper.convert(item);
         } else {

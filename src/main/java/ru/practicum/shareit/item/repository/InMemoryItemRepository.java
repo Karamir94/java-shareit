@@ -14,8 +14,8 @@ public class InMemoryItemRepository implements ItemRepository {
     private int id = 0;
 
     @Override
-    public Set<Integer> getUsersItems(int id) {
-        Set<Integer> itemsForUser = usersItems.getOrDefault(id, new HashSet<>());
+    public Set<Integer> getUsersItemsId(int id) {
+        Set<Integer> itemsForUser = usersItems.getOrDefault(id, Set.of());
         return itemsForUser;
     }
 
@@ -33,8 +33,8 @@ public class InMemoryItemRepository implements ItemRepository {
     }
 
     @Override
-    public List<Item> getAll(int userId) {
-        Set<Integer> itemKeys = usersItems.get(userId);
+    public List<Item> getAllUsersItems(int userId) {
+        Set<Integer> itemKeys = getUsersItemsId(userId);
         List<Item> itemsList = new ArrayList<>();
         for (Integer key : itemKeys) {
             itemsList.add(items.get(key));

@@ -8,11 +8,11 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface ItemRepository {
-    Set<Integer> getUsersItems(int id);
+    Set<Integer> getUsersItemsId(int id);
 
     List<Item> findItem(String text);
 
-    List<Item> getAll(int userId);
+    List<Item> getAllUsersItems(int userId);
 
     Optional<Item> getItem(int id);
 
