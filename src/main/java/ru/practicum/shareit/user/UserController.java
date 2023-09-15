@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Create;
 import ru.practicum.shareit.Update;
 import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.service.UserServiceImpl;
 
 import java.util.List;
 
@@ -16,35 +17,35 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserServiceImpl userServiceImpl;
 
     @GetMapping
     public List<UserDto> getAll() {
         log.info("Получен GET запрос");
-        return userService.getAll();
+        return userServiceImpl.getAllUsers();
     }
 
     @GetMapping("/{id}")
-    public UserDto getUser(@PathVariable int id) {
+    public UserDto getUser(@PathVariable long id) {
         log.info("Получен GET запрос");
-        return userService.getUser(id);
+        return userServiceImpl.getUserById(id);
     }
 
     @PostMapping()
     public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
         log.info("Получен POST запрос");
-        return userService.create(userDto);
+        return userServiceImpl.createUser(userDto);
     }
 
     @PatchMapping("/{id}")
-    public UserDto update(@PathVariable int id, @Validated(Update.class) @RequestBody UserDto userDto) {
+    public UserDto update(@PathVariable long id, @Validated(Update.class) @RequestBody UserDto userDto) {
         log.info("Получен PUT запрос");
-        return userService.update(id, userDto);
+        return userServiceImpl.updateUser(userDto, id);
     }
 
     @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable int id) {
+    public void deleteUser(@PathVariable long id) {
         log.info("Получен DELETE запрос");
-        userService.deleteUser(id);
+        userServiceImpl.deleteUser(id);
     }
 }

@@ -4,21 +4,28 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.shareit.Create;
+import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
-public class ItemDto {
+public class ItemDtoDated {
+
     private Long id;
-    @NotBlank(groups = {Create.class})
+
     private String name;
-    @NotBlank(groups = {Create.class})
+
     private String description;
-    @NotNull(groups = {Create.class})
+
     private Boolean available;
+
+    private BookingDtoForItem lastBooking;
+
+    private BookingDtoForItem nextBooking;
+
+    private List<CommentDto> comments = new ArrayList<>();
 }
