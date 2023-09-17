@@ -1,14 +1,16 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.dto.BookingDtoForItem;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ItemMapper {
+
     public static ItemDto toItemDto(Item item) {
         return new ItemDto(
                 item.getId(),
@@ -21,7 +23,7 @@ public class ItemMapper {
     public static ItemDtoDated toItemDto(Item item,
                                          BookingDtoForItem lastBooking,
                                          BookingDtoForItem nextBooking,
-                                         List<CommentDto> comments) {
+                                         List<CommentDtoOut> comments) {
         return new ItemDtoDated(
                 item.getId(),
                 item.getName(),

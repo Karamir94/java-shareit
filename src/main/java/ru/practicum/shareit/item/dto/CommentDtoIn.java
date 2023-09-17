@@ -1,13 +1,11 @@
-package ru.practicum.shareit.user.dto;
+package ru.practicum.shareit.item.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -15,16 +13,11 @@ import javax.validation.constraints.Size;
 @AllArgsConstructor
 @Getter
 @Setter
-public class UserDto {
+public class CommentDtoIn {
 
     private Long id;
 
     @NotBlank(groups = {Create.class})
-    @Size(max = 50)
-    private String name;
-
-    @NotBlank(groups = {Create.class})
-    @Email(groups = {Create.class, Update.class})
-    @Size(max = 100)
-    private String email;
+    @Size(max = 500)
+    private String text;
 }

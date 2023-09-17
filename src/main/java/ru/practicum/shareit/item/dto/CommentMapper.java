@@ -1,16 +1,17 @@
 package ru.practicum.shareit.item.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommentMapper {
 
-    public static Comment toComment(CommentDto comment, Item item, User user) {
+    public static Comment toComment(CommentDtoIn comment, Item item, User user) {
         return new Comment(
                 comment.getId(),
                 comment.getText(),
@@ -20,9 +21,9 @@ public class CommentMapper {
         );
     }
 
-    public static CommentDto toCommentDto(Comment comment) {
+    public static CommentDtoOut toCommentDto(Comment comment) {
 
-        return new CommentDto(
+        return new CommentDtoOut(
                 comment.getId(),
                 comment.getText(),
                 ItemMapper.toItemDto(comment.getItem()),

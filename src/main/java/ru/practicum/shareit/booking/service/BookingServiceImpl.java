@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
@@ -37,15 +38,8 @@ public class BookingServiceImpl implements BookingService {
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Предмета с ID " + bookingDto.getItemId()
                         + " не зарегистрировано"));
-        if (bookingDto.getEnd() == null || bookingDto.getStart() == null) {
-            throw new BadParameterException("отсутствует дата начала/окончания бронирования");
-        }
         if (!item.getIsAvailable()) {
             throw new BadParameterException("вещь недоступна для аренды");
-        }
-        if (bookingDto.getEnd().isBefore(bookingDto.getStart()) || bookingDto.getEnd().isEqual(bookingDto.getStart())) {
-            throw new BadParameterException("В запросе аренды дата/время " +
-                    "возврата должна быть строго позже начала аренды");
         }
         if (userId == (item.getUser().getId())) {
             throw new NotFoundException("ошибка: запрос аренды отправлен от владельца вещи");
@@ -73,7 +67,7 @@ public class BookingServiceImpl implements BookingService {
             throw new BadParameterException("У запроса на аренду с ID " + bookingId +
                     " нельзя поменять статус. Текущий статус: " + booking.getStatus());
         }
-        return BookingMapper.toBookingDto(bookingRepository.save(booking));
+        return BookingMapper.toBookingDto(booking);
     }
 
     @Override
@@ -103,23 +97,27 @@ public class BookingServiceImpl implements BookingService {
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findAllPastByBookerId(userId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllPastByBookerId(userId, LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findAllFutureByBookerId(userId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllFutureByBookerId(userId, LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllWaitingByBookerId(userId).stream()
+                return bookingRepository.findAllWaitingByBookerId(userId,
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllRejectedByBookerId(userId).stream()
+                return bookingRepository.findAllRejectedByBookerId(userId,
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                return null;
+                throw new NotFoundException("Некорректно выбран тип бронирования" + state);
         }
     }
 
@@ -131,7 +129,8 @@ public class BookingServiceImpl implements BookingService {
         }
         switch (state) {
             case ALL:
-                return bookingRepository.findByOwnerIdOrderByStartDesc(userId).stream()
+                return bookingRepository.findByOwnerIdOrderByStartDesc(userId,
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case CURRENT:
@@ -139,23 +138,27 @@ public class BookingServiceImpl implements BookingService {
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case PAST:
-                return bookingRepository.findAllPastByOwnerId(userId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllPastByOwnerId(userId, LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case FUTURE:
-                return bookingRepository.findAllFutureByOwnerId(userId, LocalDateTime.now()).stream()
+                return bookingRepository.findAllFutureByOwnerId(userId, LocalDateTime.now(),
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case WAITING:
-                return bookingRepository.findAllWaitingByOwnerId(userId).stream()
+                return bookingRepository.findAllWaitingByOwnerId(userId,
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             case REJECTED:
-                return bookingRepository.findAllRejectedByOwnerId(userId).stream()
+                return bookingRepository.findAllRejectedByOwnerId(userId,
+                                Sort.by(Sort.Direction.DESC, "start")).stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
             default:
-                return null;
+                throw new NotFoundException("Некорректно выбран тип бронирования" + state);
         }
     }
 

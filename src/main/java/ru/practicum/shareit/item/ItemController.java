@@ -6,7 +6,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.Create;
 import ru.practicum.shareit.Update;
-import ru.practicum.shareit.item.dto.CommentDto;
+import ru.practicum.shareit.item.dto.CommentDtoIn;
+import ru.practicum.shareit.item.dto.CommentDtoOut;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.service.ItemService;
@@ -48,9 +49,9 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public CommentDto saveComment(@RequestHeader(USER_ID) long userId,
-                                  @PathVariable long itemId,
-                                  @RequestBody @Validated(Create.class) CommentDto comment) {
+    public CommentDtoOut saveComment(@RequestHeader(USER_ID) long userId,
+                                     @PathVariable long itemId,
+                                     @RequestBody @Validated(Create.class) CommentDtoIn comment) {
         log.info("Получен POST запрос на создание комментария");
         return itemService.saveComment(userId, itemId, comment);
     }

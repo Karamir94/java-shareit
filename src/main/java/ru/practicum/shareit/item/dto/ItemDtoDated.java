@@ -16,16 +16,10 @@ import java.util.List;
 public class ItemDtoDated {
 
     private Long id;
-
     private String name;
-
     private String description;
-
     private Boolean available;
-
     private BookingDtoForItem lastBooking;
-
     private BookingDtoForItem nextBooking;
-
-    private List<CommentDto> comments = new ArrayList<>();
+    private List<CommentDtoOut> comments = new ArrayList<>();
 }

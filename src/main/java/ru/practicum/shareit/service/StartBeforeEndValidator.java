@@ -10,6 +10,6 @@ public class StartBeforeEndValidator implements ConstraintValidator<StartBeforeE
         if (checker == null || checker.getStart() == null || checker.getEnd() == null) {
             return true;
         }
-        return checker.getEnd().isAfter(checker.getStart()) || checker.getStart().isEqual(checker.getEnd());
+        return checker.getEnd().isAfter(checker.getStart());
     }
 }
