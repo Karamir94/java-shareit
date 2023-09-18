@@ -38,8 +38,9 @@ public class ItemMapper {
     public static Item toItem(ItemDto itemDto, User user) {
         return new Item(
                 itemDto.getId(),
-                itemDto.getName() != null ? itemDto.getName() : null,
-                itemDto.getDescription() != null ? itemDto.getDescription() : null,
+                (itemDto.getName() != null && !itemDto.getName().isBlank()) ? itemDto.getName() : null,
+                (itemDto.getDescription() != null && !itemDto.getDescription().isBlank())
+                        ? itemDto.getDescription() : null,
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : null,
                 user
         );
@@ -48,8 +49,9 @@ public class ItemMapper {
     public static Item toItem(ItemDto itemDto, Item item) {
         return new Item(
                 itemDto.getId(),
-                itemDto.getName() != null ? itemDto.getName() : item.getName(),
-                itemDto.getDescription() != null ? itemDto.getDescription() : item.getDescription(),
+                (itemDto.getName() != null && !itemDto.getName().isBlank()) ? itemDto.getName() : item.getName(),
+                (itemDto.getDescription() != null && !itemDto.getDescription().isBlank())
+                        ? itemDto.getDescription() : item.getDescription(),
                 itemDto.getAvailable() != null ? itemDto.getAvailable() : item.getIsAvailable(),
                 item.getUser()
         );

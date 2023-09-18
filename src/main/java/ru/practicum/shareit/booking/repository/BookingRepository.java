@@ -91,7 +91,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b " +
             "from Booking b " +
             "join b.item as i " +
-            "where i.id = ?1 and b.start < ?2 and b.status = 'APPROVED'")
+            "where i.id = ?1 and b.start <= ?2 and b.status = 'APPROVED'")
     List<Booking> findLastBookingByItemId(Long itemId, LocalDateTime dateTime, Sort sort);
 
     @Query("select b " +
@@ -103,7 +103,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     @Query("select b " +
             "from Booking b " +
             "join b.item as i join i.user as u " +
-            "where u.id = ?1 and b.start < ?2  and i.id in (?3) and b.status = 'APPROVED'")
+            "where u.id = ?1 and b.start <= ?2  and i.id in (?3) and b.status = 'APPROVED'")
     List<Booking> findLastBookingsByUserIdByItemIn(Long userId, LocalDateTime dateTime, List<Long> ids, Sort sort);
 
     @Query("select b " +

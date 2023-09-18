@@ -22,6 +22,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -135,19 +136,15 @@ public class ItemServiceImpl implements ItemService {
         for (Item item : items) {
             Booking lastBooking = null;
             Booking nextBooking = null;
-            List<CommentDtoOut> commentsList = new ArrayList<>();
 
-            if (lastBookingsMap != null && lastBookingsMap.get(item) != null && lastBookingsMap.get(item).get(0) != null) {
+            if (lastBookingsMap.get(item) != null && lastBookingsMap.get(item).get(0) != null) {
                 lastBooking = lastBookingsMap.get(item).get(0);
             }
-            if (nextBookingsMap != null && nextBookingsMap.get(item) != null && nextBookingsMap.get(item).get(0) != null) {
+            if (nextBookingsMap.get(item) != null && nextBookingsMap.get(item).get(0) != null) {
                 nextBooking = nextBookingsMap.get(item).get(0);
             }
-            if (comments != null && comments.get(item) != null) {
-                for (Comment comment : comments.get(item)) {
-                    commentsList.add(CommentMapper.toCommentDto(comment));
-                }
-            }
+            List<CommentDtoOut> commentsList = comments.getOrDefault(item,
+                    List.of()).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
             datedItemList.add(ItemMapper.toItemDto(item, BookingMapper.toItemBookingDto(lastBooking),
                     BookingMapper.toItemBookingDto(nextBooking), commentsList));
         }
