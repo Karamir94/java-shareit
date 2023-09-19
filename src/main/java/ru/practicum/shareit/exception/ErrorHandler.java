@@ -9,10 +9,13 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import javax.validation.ConstraintViolationException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 @RestControllerAdvice
 @Slf4j
 public class ErrorHandler {
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ErrorResponse handleNotFoundException(final NotFoundException e) {
@@ -27,9 +30,9 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler
+    @ExceptionHandler({BadParameterException.class, MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+    public ErrorResponse handleItemNotAvailableExc(final RuntimeException e) {
         log.info("Validation: {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
     }
@@ -45,5 +48,14 @@ public class ErrorHandler {
     public ErrorResponse handleException(final Exception e) {
         log.warn("Error", e);
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleOtherExc(final Throwable e) {
+        log.info("Error: ", e);
+        StringWriter errors = new StringWriter();
+        e.printStackTrace(new PrintWriter(errors));
+        return new ErrorResponse(errors.toString());
     }
 }

@@ -1,28 +1,33 @@
 package ru.practicum.shareit.user.dto;
 
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class UserMapper {
-    private User user;
-    private UserDto userDto;
 
-    public User convert(UserDto userDto) {
-        user = new User();
-
-        user.setId(userDto.getId());
-        user.setName(userDto.getName());
-        user.setEmail(userDto.getEmail());
-        return user;
+    public static UserDto toUserDto(User user) {
+        return new UserDto(
+                user.getId(),
+                user.getName() != null ? user.getName() : null,
+                user.getEmail()
+        );
     }
 
-    public UserDto convert(User user) {
-        userDto = new UserDto();
+    public static User toUser(UserDto userDto) {
+        return new User(
+                userDto.getId(),
+                userDto.getName() != null && !userDto.getName().isBlank() ? userDto.getName() : null,
+                userDto.getEmail() != null && !userDto.getEmail().isBlank() ? userDto.getEmail() : null
+        );
+    }
 
-        userDto.setId(user.getId());
-        userDto.setName(user.getName());
-        userDto.setEmail(user.getEmail());
-        return userDto;
+    public static User toUser(UserDto userDto, User user) {
+        return new User(
+                userDto.getId(),
+                userDto.getName() != null && !userDto.getName().isBlank() ? userDto.getName() : user.getName(),
+                userDto.getEmail() != null && !userDto.getEmail().isBlank() ? userDto.getEmail() : user.getEmail()
+        );
     }
 }
