@@ -9,16 +9,20 @@ import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @Query("select c " +
-            "from Comment c " +
-            "join c.item as i " +
-            "where i.id in (?1) ")
-    List<Comment> findByItemIn(List<Long> itemIds, Sort sort);
+//    @Query("select c " +
+//            "from Comment c " +
+//            "join c.item as i " +
+//            "where i.id in (?1) ")
+//    List<Comment> findByItemId(List<Long> itemIds, Sort sort);
+//
+//    @Query("select c " +
+//            "from Comment c " +
+//            "join c.item as i " +
+//            "where i.id = ?1 " +
+//            "order by c.created desc ")
+//    List<Comment> findCommentsByItemId(Long itemId);
 
-    @Query("select c " +
-            "from Comment c " +
-            "join c.item as i " +
-            "where i.id = ?1 " +
-            "order by c.created desc ")
-    List<Comment> findCommentsByItemId(Long itemId);
+    List<Comment> findAllByItemUserIdInOrderByCreatedDesc(List<Long> userIds);
+
+    List<Comment> findAllByItemIdOrderByCreatedDesc(Long itemId);
 }
