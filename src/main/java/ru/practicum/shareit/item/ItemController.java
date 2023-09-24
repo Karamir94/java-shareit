@@ -16,11 +16,12 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-import static ru.practicum.shareit.item.model.Header.USER_ID;
+import static ru.practicum.shareit.service.Header.USER_ID;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping("/items")
 public class ItemController {
 

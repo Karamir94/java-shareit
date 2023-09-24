@@ -4,16 +4,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.Create;
 import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.service.RequestService;
 
-import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
-
 import java.util.List;
 
-import static ru.practicum.shareit.item.model.Header.USER_ID;
+import static ru.practicum.shareit.service.Header.USER_ID;
 
 @Slf4j
 @RestController
@@ -25,7 +24,8 @@ public class RequestController {
     private final RequestService requestService;
 
     @PostMapping
-    public RequestDto saveItemRequest(@RequestHeader(USER_ID) long userId, @RequestBody @Valid RequestDto requestDto) {
+    public RequestDto saveItemRequest(@RequestHeader(USER_ID) long userId,
+                                      @RequestBody @Validated(Create.class) RequestDto requestDto) {
         log.info("В метод saveItemRequest передан userId {}, itemRequestDto.description: {}",
                 userId, requestDto.getDescription());
 
@@ -33,7 +33,7 @@ public class RequestController {
     }
 
     @GetMapping
-    public List<RequestDto> getItemRequests(@RequestHeader(USER_ID) long userId) { // список СВОИХ запросов
+    public List<RequestDto> getItemRequests(@RequestHeader(USER_ID) long userId) { // список собственных запросов
         log.info("В метод getItemRequests передан userId {}", userId);
 
         return requestService.getUserItemRequests(userId);

@@ -10,11 +10,10 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.request.model.Request;
-import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.item.repository.ItemRepository;
-
+import ru.practicum.shareit.request.dto.RequestDto;
 import ru.practicum.shareit.request.dto.RequestMapper;
+import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -87,7 +86,7 @@ public class RequestServiceImpl implements RequestService {
         for (Request request : requests) {
             List<ItemDto> requestItems = new ArrayList<>();
             for (Item item : items) {
-                if (item.getRequest().getId() == request.getId()) {
+                if (item.getRequest().getId().equals(request.getId())) {
                     requestItems.add(ItemMapper.toItemDto(item));
                 }
             }

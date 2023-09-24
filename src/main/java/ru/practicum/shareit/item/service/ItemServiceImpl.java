@@ -3,7 +3,6 @@ package ru.practicum.shareit.item.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingMapper;
@@ -30,7 +29,6 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.data.domain.Sort.Direction.DESC;
 
 @Service
 @RequiredArgsConstructor
@@ -95,7 +93,7 @@ public class ItemServiceImpl implements ItemService {
         }
 
         Pageable page = PageRequest.of(from / size, size);
-        List<Item> itemsList = itemRepository.search(text, page);
+        List<Item> itemsList = itemRepository.findByNameOrDescription(text, page);
         return itemsList.stream()
                 .map(ItemMapper::toItemDto)
                 .collect(toList());
@@ -117,12 +115,8 @@ public class ItemServiceImpl implements ItemService {
         }
         Booking lastBooking = bookingRepository.findFirstByItemIdAndStartBeforeAndStatusOrderByStartDesc(itemId,
                 LocalDateTime.now(), BookingStatus.APPROVED).orElse(null);
-//        BookingDtoForItem lastBooking = BookingMapper.toItemBookingDto(lastBookings.isEmpty()
-//                ? null : lastBookings.get(0));
         Booking nextBooking = bookingRepository.findFirstByItemIdAndStartAfterAndStatusOrderByStart(itemId,
                 LocalDateTime.now(), BookingStatus.APPROVED).orElse(null);
-//        BookingDtoForItem nextBooking = BookingMapper.toItemBookingDto(nextBookings.isEmpty()
-//                ? null : nextBookings.get(0));
 
         return ItemMapper.toItemDto(item, BookingMapper.toItemBookingDto(lastBooking),
                 BookingMapper.toItemBookingDto(nextBooking), comments);

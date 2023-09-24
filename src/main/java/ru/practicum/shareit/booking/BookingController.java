@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
 import ru.practicum.shareit.booking.dto.BookingDtoOut;
 import ru.practicum.shareit.booking.model.BookingState;
+import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.BadParameterException;
 
@@ -15,7 +16,7 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-import static ru.practicum.shareit.item.model.Header.USER_ID;
+import static ru.practicum.shareit.service.Header.USER_ID;
 
 @Slf4j
 @RestController
@@ -33,7 +34,7 @@ public class BookingController {
         log.info("В метод saveBooking передан userId {}, bookingDto.itemId {}, bookingDto.start {}, bookingDto.end {}",
                 userId, bookingDto.getItemId(), bookingDto.getStart(), bookingDto.getEnd());
 
-        return bookingService.saveBooking(userId, bookingDto);
+        return bookingService.saveBooking(userId, bookingDto, BookingStatus.WAITING);
     }
 
     @PatchMapping("/{bookingId}")

@@ -3,7 +3,6 @@ package ru.practicum.shareit.booking.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingDtoIn;
@@ -36,7 +35,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingDtoOut saveBooking(long userId, BookingDtoIn bookingDto) {
+    public BookingDtoOut saveBooking(long userId, BookingDtoIn bookingDto, BookingStatus status) {
         User user = checkUser(userId);
         Item item = itemRepository.findById(bookingDto.getItemId())
                 .orElseThrow(() -> new NotFoundException("Предмета с ID " + bookingDto.getItemId()
@@ -48,6 +47,7 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("ошибка: запрос аренды отправлен от владельца вещи");
         }
         Booking booking = BookingMapper.toBooking(bookingDto, user, item);
+        booking.setStatus(status);
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
@@ -59,7 +59,8 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new NotFoundException("Запроса на аренду с ID "
                         + bookingId + " не зарегистрировано"));
         if (booking.getItem().getUser().getId() != userId) {
-            throw new NotFoundException("У пользователя с ID " + userId + " нет запроса на аренду с ID " + bookingId);
+            throw new NotFoundException("Пользователь ID " + userId + " не является владельцем вещи с ID "
+                    + booking.getItem().getId() + " и не может менять одобрить/отклонить запрос на аренду этой вещи");
         }
         if (booking.getStatus() == BookingStatus.WAITING) {
             if (approved) {
@@ -103,7 +104,7 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
                 break;
             case CURRENT:
-                bookings =  bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStart(userId,
+                bookings = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStart(userId,
                                 LocalDateTime.now(), LocalDateTime.now(), page)
                         .stream()
                         .map(BookingMapper::toBookingDto)
@@ -150,9 +151,6 @@ public class BookingServiceImpl implements BookingService {
         Pageable page = PageRequest.of(from / size, size);
 
         List<BookingDtoOut> bookings = new ArrayList<>();
-//        if (itemRepository.findAllItemsByUserIdOrderById(userId, page).isEmpty()) {
-//            throw new NotFoundException("Пользователь " + userId + " не является хозяином ни одной вещи");
-//        }
         switch (state) {
             case ALL:
                 bookings = bookingRepository.findAllByItemUserIdOrderByStartDesc(userId, page)
@@ -175,8 +173,8 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
                 break;
             case FUTURE:
-                bookings = bookingRepository.findAllByItemUserIdAndStartAfterOrderByStartDesc(userId, LocalDateTime.now(),
-                                page)
+                bookings = bookingRepository.findAllByItemUserIdAndStartAfterOrderByStartDesc(userId,
+                                LocalDateTime.now(), page)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
@@ -189,8 +187,8 @@ public class BookingServiceImpl implements BookingService {
                         .collect(Collectors.toList());
                 break;
             case REJECTED:
-                bookings = bookingRepository.findAllByItemUserIdAndStatusOrderByStartDesc(userId, BookingStatus.REJECTED,
-                                page)
+                bookings = bookingRepository.findAllByItemUserIdAndStatusOrderByStartDesc(userId,
+                                BookingStatus.REJECTED, page)
                         .stream()
                         .map(BookingMapper::toBookingDto)
                         .collect(Collectors.toList());
