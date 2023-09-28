@@ -7,26 +7,27 @@ import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestMapper {
 
-    public static Request toItemRequest(RequestDto requestDto, User user) {
+    public static Request toItemRequest(RequestDtoIn requestDto, User user) {
         return new Request(
                 requestDto.getId(),
                 requestDto.getDescription(),
                 user,
-                requestDto.getCreated() != null ? requestDto.getCreated() : LocalDateTime.now()
+                LocalDateTime.now()
         );
     }
 
-    public static RequestDto toItemRequestDto(Request request, List<ItemDto> items) {
-        return new RequestDto(
+    public static RequestDtoOut toItemRequestDto(Request request, List<ItemDto> items) {
+        return new RequestDtoOut(
                 request.getId(),
                 request.getDescription(),
                 request.getCreated(),
-                items
+                items != null ? items : Collections.emptyList()
         );
     }
 }

@@ -3,7 +3,8 @@ package ru.practicum.shareit.request;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoIn;
+import ru.practicum.shareit.request.dto.RequestDtoOut;
 import ru.practicum.shareit.request.dto.RequestMapper;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.user.model.User;
@@ -18,13 +19,13 @@ class RequestMapperTest {
 
     private User user;
     private Request request;
-    private RequestDto requestDto;
+    private RequestDtoIn requestDto;
     private ItemDto itemDto;
 
     @BeforeEach
     void beforeEach() {
         user = new User(1L, "Иван Иванович", "ii@mail.ru");
-        requestDto = new RequestDto(1L, "Описание запроса 1", LocalDateTime.now(), null);
+        requestDto = new RequestDtoIn(1L, "Описание запроса 1");
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, 1L);
         request = new Request(1L, "Описание вещи 1", user, LocalDateTime.now());
     }
@@ -35,7 +36,7 @@ class RequestMapperTest {
 
         assertEquals(requestDto.getId(), mapperRequest.getId());
         assertEquals(requestDto.getDescription(), mapperRequest.getDescription());
-        assertNotNull(requestDto.getCreated());
+        assertNotNull(mapperRequest.getCreated());
         assertEquals(user.getId(), mapperRequest.getUser().getId());
         assertEquals(user.getName(), mapperRequest.getUser().getName());
         assertEquals(user.getEmail(), mapperRequest.getUser().getEmail());
@@ -43,7 +44,7 @@ class RequestMapperTest {
 
     @Test
     void shouldConvertToItemRequestDto() {
-        RequestDto mapperRequestDto = RequestMapper.toItemRequestDto(request, List.of(itemDto));
+        RequestDtoOut mapperRequestDto = RequestMapper.toItemRequestDto(request, List.of(itemDto));
 
         assertEquals(request.getId(), mapperRequestDto.getId());
         assertEquals(request.getDescription(), mapperRequestDto.getDescription());

@@ -9,7 +9,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoOut;
 import ru.practicum.shareit.request.service.RequestServiceImpl;
 
 import java.nio.charset.StandardCharsets;
@@ -38,11 +38,11 @@ class RequestControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    private RequestDto requestDto;
+    private RequestDtoOut requestDto;
 
     @BeforeEach
     public void itemCreate() {
-        requestDto = new RequestDto(1L, "Описание запроса",
+        requestDto = new RequestDtoOut(1L, "Описание запроса",
                 LocalDateTime.now(), null);
     }
 
@@ -121,7 +121,7 @@ class RequestControllerTest {
     void shouldGetItemRequestsFromOtherUsers() throws Exception {
         int from = 0;
         int size = 5;
-        List<RequestDto> requestDtoList = List.of(requestDto);
+        List<RequestDtoOut> requestDtoList = List.of(requestDto);
         when(requestService.getItemRequestsFromOtherUsers(anyLong(), anyInt(), anyInt()))
                 .thenReturn(requestDtoList);
 

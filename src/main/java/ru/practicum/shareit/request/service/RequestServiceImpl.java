@@ -9,9 +9,9 @@ import ru.practicum.shareit.exception.BadParameterException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoIn;
+import ru.practicum.shareit.request.dto.RequestDtoOut;
 import ru.practicum.shareit.request.dto.RequestMapper;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.repository.RequestRepository;
@@ -20,7 +20,11 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Service
 @RequiredArgsConstructor
@@ -33,31 +37,34 @@ public class RequestServiceImpl implements RequestService {
 
     @Transactional
     @Override
-    public RequestDto createItemRequest(long userId, RequestDto requestDto) {
+    public RequestDtoOut createItemRequest(long userId, RequestDtoIn requestDto) {
         User user = checkUser(userId);
 
-        if (requestDto.getDescription() == null) {
-            throw new BadParameterException("отсутствует описание");
-        }
         Request requestFromDto = RequestMapper.toItemRequest(requestDto, user);
         Request request = requestRepository.save(requestFromDto);
         return RequestMapper.toItemRequestDto(request, null);
     }
 
     @Override
-    public List<RequestDto> getUserItemRequests(long userId) {
+    public List<RequestDtoOut> getUserItemRequests(long userId) {
         checkUser(userId);
 
         List<Request> requests = requestRepository.findAllByUserIdOrderByCreatedDesc(userId);
-        List<Long> itemRequestsIds = requests.stream()
+
+        List<Long> requestsIds = requests
+                .stream()
                 .map(Request::getId)
                 .collect(Collectors.toList());
-        List<Item> items = itemRepository.findAllByRequestIdInOrderById(itemRequestsIds);
-        return collectRequestDtoList(requests, items);
+        Map<Long, List<ItemDto>> requestItemsMap = itemRepository.findAllByRequestIdInOrderById(requestsIds)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(groupingBy(ItemDto::getRequestId, toList()));
+
+        return collectRequestDtoList(requestItemsMap, requests);
     }
 
     @Override
-    public List<RequestDto> getItemRequestsFromOtherUsers(long userId, int from, int size) {
+    public List<RequestDtoOut> getItemRequestsFromOtherUsers(long userId, int from, int size) {
         checkUser(userId);
 
         Pageable page = PageRequest.of(from, size);
@@ -65,12 +72,16 @@ public class RequestServiceImpl implements RequestService {
         List<Long> requestsIds = requests.stream()
                 .map(Request::getId)
                 .collect(Collectors.toList());
-        List<Item> items = itemRepository.findAllByRequestUserIdNotAndRequestIdInOrderById(userId, requestsIds);
-        return collectRequestDtoList(requests, items);
+        Map<Long, List<ItemDto>> requestItemsMap = itemRepository.findAllByRequestIdInOrderById(requestsIds)
+                .stream()
+                .map(ItemMapper::toItemDto)
+                .collect(groupingBy(ItemDto::getRequestId, toList()));
+
+        return collectRequestDtoList(requestItemsMap, requests);
     }
 
     @Override
-    public RequestDto getOneItemRequest(long userId, long requestId) {
+    public RequestDtoOut getOneItemRequest(long userId, long requestId) {
         checkUser(userId);
 
         Request request = requestRepository.findById(requestId)
@@ -81,16 +92,12 @@ public class RequestServiceImpl implements RequestService {
         return RequestMapper.toItemRequestDto(request, itemDtos);
     }
 
-    private List<RequestDto> collectRequestDtoList(List<Request> requests, List<Item> items) {
-        List<RequestDto> requestDtos = new ArrayList<>();
+    private List<RequestDtoOut> collectRequestDtoList(Map<Long, List<ItemDto>> requestItemsMap,
+                                                      List<Request> requests) {
+        List<RequestDtoOut> requestDtos = new ArrayList<>();
+
         for (Request request : requests) {
-            List<ItemDto> requestItems = new ArrayList<>();
-            for (Item item : items) {
-                if (item.getRequest().getId().equals(request.getId())) {
-                    requestItems.add(ItemMapper.toItemDto(item));
-                }
-            }
-            requestDtos.add(RequestMapper.toItemRequestDto(request, requestItems));
+            requestDtos.add(RequestMapper.toItemRequestDto(request, requestItemsMap.get(request.getId())));
         }
         return requestDtos;
     }

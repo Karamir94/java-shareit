@@ -10,7 +10,8 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
-import ru.practicum.shareit.request.dto.RequestDto;
+import ru.practicum.shareit.request.dto.RequestDtoIn;
+import ru.practicum.shareit.request.dto.RequestDtoOut;
 import ru.practicum.shareit.request.model.Request;
 import ru.practicum.shareit.request.service.RequestService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -18,7 +19,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,14 +41,14 @@ class RequestServiceImplTest {
     private ItemDto itemDto;
     private UserDto userDto;
     private UserDto userDto2;
-    private RequestDto requestDto;
+    private RequestDtoIn requestDto;
 
     @BeforeEach
     void beforeEach() {
         itemDto = new ItemDto(1L, "Вещь 1", "Описание вещи 1", true, 1L);
         userDto = new UserDto(1L, "Иван Иванович", "ii@mail.ru");
         userDto2 = new UserDto(2L, "Петр Петрович", "pp@mail.ru");
-        requestDto = new RequestDto(1L, "Описание запроса 1", LocalDateTime.now(), null);
+        requestDto = new RequestDtoIn(1L, "Описание запроса 1");
 
         userService.createUser(userDto);
         userService.createUser(userDto2);
@@ -56,7 +57,7 @@ class RequestServiceImplTest {
     @Test
     void shouldCreateItemRequest() {
 
-        RequestDto methodRequest = requestService.createItemRequest(userDto2.getId(), requestDto);
+        RequestDtoOut methodRequest = requestService.createItemRequest(userDto2.getId(), requestDto);
 
         TypedQuery<Request> query = manager.createQuery("select r from Request r where r.id = :id", Request.class);
         Request dbRequest = query.setParameter("id", requestDto.getId())
@@ -65,7 +66,7 @@ class RequestServiceImplTest {
         assertThat(methodRequest.getId(), equalTo(dbRequest.getId()));
         assertThat(methodRequest.getDescription(), equalTo(dbRequest.getDescription()));
         assertThat(methodRequest.getCreated(), notNullValue());
-        assertThat(methodRequest.getItems(), nullValue());
+        assertThat(methodRequest.getItems(), equalTo(Collections.emptyList()));
     }
 
     @Test
@@ -86,7 +87,7 @@ class RequestServiceImplTest {
         requestService.createItemRequest(userId, requestDto); // создали запрос на вещь 1 от User 2
         itemService.createItem(userDto.getId(), itemDto); // создали вещь 1 принадлежиащую User 1
 
-        List<RequestDto> methodRequestList = requestService.getUserItemRequests(userId);
+        List<RequestDtoOut> methodRequestList = requestService.getUserItemRequests(userId);
 
         TypedQuery<Request> query = manager.createQuery("select r from Request r where r.user.id = :id",
                 Request.class);
@@ -122,7 +123,7 @@ class RequestServiceImplTest {
         requestService.createItemRequest(userDto2.getId(), requestDto); // создали запрос на вещь 1 от User 2
         itemService.createItem(userDto.getId(), itemDto);
 
-        List<RequestDto> methodRequestList = requestService.getItemRequestsFromOtherUsers(userDto3.getId(), from, size);
+        List<RequestDtoOut> methodRequestList = requestService.getItemRequestsFromOtherUsers(userDto3.getId(), from, size);
 
         TypedQuery<Request> query = manager.createQuery("select r " +
                 "from Request r " +
@@ -157,7 +158,7 @@ class RequestServiceImplTest {
         requestService.createItemRequest(userDto2.getId(), requestDto); // создали запрос на вещь 1 от User 2
         itemService.createItem(userDto.getId(), itemDto);
 
-        List<RequestDto> methodRequestList = requestService.getItemRequestsFromOtherUsers(userDto2.getId(), from, size);
+        List<RequestDtoOut> methodRequestList = requestService.getItemRequestsFromOtherUsers(userDto2.getId(), from, size);
 
         assertThat(methodRequestList.size(), equalTo(0));
     }
@@ -169,7 +170,7 @@ class RequestServiceImplTest {
         requestService.createItemRequest(userDto2.getId(), requestDto); // создали запрос на вещь 1 от User 2
         itemService.createItem(userDto.getId(), itemDto);
 
-        RequestDto methodRequest = requestService.getOneItemRequest(userId, requestId);
+        RequestDtoOut methodRequest = requestService.getOneItemRequest(userId, requestId);
 
         TypedQuery<Request> query = manager.createQuery("select r " +
                 "from Request r " +
