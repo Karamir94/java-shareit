@@ -12,39 +12,49 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoDated;
 import ru.practicum.shareit.item.service.ItemService;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Positive;
 import java.util.List;
 
-import static ru.practicum.shareit.item.model.Header.USER_ID;
+import static ru.practicum.shareit.service.Header.USER_ID;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
+@Validated
 @RequestMapping("/items")
 public class ItemController {
 
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDtoDated> getUserItems(@RequestHeader(USER_ID) long userId) {
-        log.info("Получен GET запрос");
-        return itemService.getUserItems(userId);
+    public List<ItemDtoDated> getUserItems(@RequestHeader(USER_ID) long userId,
+                                           @RequestParam(defaultValue = "0") @Min(0) int from,
+                                           @RequestParam(defaultValue = "20") @Positive int size) {
+        log.info("В метод getUserItems передан userId {}, индекс первого элемента {}, количество элементов на " +
+                "странице {}", userId, from, size);
+        return itemService.getUserItems(userId, from, size);
     }
 
     @GetMapping("/{id}")
     public ItemDtoDated getItem(@RequestHeader(USER_ID) long userId, @PathVariable long id) {
-        log.info("Получен GET запрос");
+        log.info("В метод getItemById передан userId {}, itemId {}", userId, id);
         return itemService.getItemById(userId, id);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> search(@RequestParam String text) {
-        log.info("Получен GET запрос на поиск вещи");
-        return itemService.search(text);
+    public List<ItemDto> search(@RequestParam String text,
+                                @RequestParam(defaultValue = "0") @Min(0) int from,
+                                @RequestParam(defaultValue = "20") @Positive int size) {
+        log.info("В метод search передан text: '{}', индекс первого элемента {}, количество элементов на " +
+                "странице {}", text, from, size);
+        return itemService.search(text, from, size);
     }
 
     @PostMapping()
     public ItemDto create(@RequestHeader(USER_ID) long userId, @Validated(Create.class) @RequestBody ItemDto itemDto) {
-        log.info("Получен POST запрос");
+        log.info("В метод create передан userId {}, itemDto.name: {}, itemDto.description: {}, itemDto.isAvailable {}",
+                userId, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
         return itemService.createItem(userId, itemDto);
     }
 
@@ -52,7 +62,8 @@ public class ItemController {
     public CommentDtoOut saveComment(@RequestHeader(USER_ID) long userId,
                                      @PathVariable long itemId,
                                      @RequestBody @Validated(Create.class) CommentDtoIn comment) {
-        log.info("Получен POST запрос на создание комментария");
+        log.info("В метод saveComment передан userId {}, itemId {}, отзыв с длиной текста: {}",
+                userId, itemId, comment.getText().length());
         return itemService.saveComment(userId, itemId, comment);
     }
 
@@ -60,13 +71,15 @@ public class ItemController {
     public ItemDto update(@RequestHeader(USER_ID) long userId,
                           @PathVariable long id,
                           @Validated(Update.class) @RequestBody ItemDto itemDto) {
-        log.info("Получен PUT запрос");
+        log.info("В метод updateItem передан userId {}, itemId {}, itemDto.name: {}, itemDto.description: {}, " +
+                        "itemDto.isAvailable {}",
+                userId, id, itemDto.getName(), itemDto.getDescription(), itemDto.getAvailable());
         return itemService.updateItem(userId, itemDto, id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteItem(@PathVariable long id) {
-        log.info("Получен DELETE запрос");
+        log.info("В метод deleteItem передан userId {}", id);
         itemService.deleteItem(id);
     }
 }
