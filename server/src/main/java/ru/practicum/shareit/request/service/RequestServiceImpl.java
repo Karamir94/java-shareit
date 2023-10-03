@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.shareit.exception.BadParameterException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemMapper;
@@ -103,14 +102,7 @@ public class RequestServiceImpl implements RequestService {
     }
 
     private User checkUser(long userId) {
-        checkId(userId);
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-    }
-
-    private void checkId(long userId) {
-        if (userId <= 0) {
-            throw new BadParameterException("id must be positive");
-        }
     }
 }

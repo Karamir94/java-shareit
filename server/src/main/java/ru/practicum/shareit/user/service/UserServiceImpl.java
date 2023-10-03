@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.dto.UserMapper;
@@ -26,7 +27,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto userDto, long userId) {
-        checkId(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
         User userFromDto = UserMapper.toUser(userDto, user);
@@ -35,6 +35,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserDto getUserById(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
@@ -54,11 +55,5 @@ public class UserServiceImpl implements UserService {
         return usersList.stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
-    }
-
-    private void checkId(long userId) {
-        if (userId <= 0) {
-            throw new NotFoundException("id must be positive");
-        }
     }
 }

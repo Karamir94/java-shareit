@@ -2,10 +2,7 @@ package ru.practicum.shareit.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.Create;
-import ru.practicum.shareit.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
 
@@ -17,36 +14,36 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserServiceImpl userService;
 
     @GetMapping
     public List<UserDto> getAll() {
         log.info("Получен GET запрос getAll");
-        return userServiceImpl.getAllUsers();
+        return userService.getAllUsers();
     }
 
     @GetMapping("/{id}")
     public UserDto getUser(@PathVariable long id) {
         log.info("В метод getUserById передан userId {}", id);
-        return userServiceImpl.getUserById(id);
+        return userService.getUserById(id);
     }
 
     @PostMapping()
-    public UserDto create(@Validated(Create.class) @RequestBody UserDto userDto) {
-        log.info("В метод create передан userDto.name {}, userDto.email {}", userDto.getName(), userDto.getEmail());
-        return userServiceImpl.createUser(userDto);
+    public UserDto createUser(@RequestBody UserDto userDto) {
+        log.info("В метод createUser передан userDto.name {}, userDto.email {}", userDto.getName(), userDto.getEmail());
+        return userService.createUser(userDto);
     }
 
-    @PatchMapping("/{id}")
-    public UserDto update(@PathVariable long id, @Validated(Update.class) @RequestBody UserDto userDto) {
+    @PatchMapping("/{userId}")
+    public UserDto updateUser(@RequestBody UserDto userDto, @PathVariable long userId) {
         log.info("В метод updateUser передан userId {}, userDto.name {}, userDto.email {}",
-                id, userDto.getName(), userDto.getEmail());
-        return userServiceImpl.updateUser(userDto, id);
+                userId, userDto.getName(), userDto.getEmail());
+        return userService.updateUser(userDto, userId);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable long id) {
         log.info("В метод deleteUser передан userId {}", id);
-        userServiceImpl.deleteUser(id);
+        userService.deleteUser(id);
     }
 }

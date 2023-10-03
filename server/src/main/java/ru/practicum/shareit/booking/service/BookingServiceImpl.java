@@ -200,14 +200,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     private User checkUser(long userId) {
-        checkId(userId);
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-    }
-
-    private void checkId(long userId) {
-        if (userId <= 0) {
-            throw new BadParameterException("id must be positive");
-        }
     }
 }

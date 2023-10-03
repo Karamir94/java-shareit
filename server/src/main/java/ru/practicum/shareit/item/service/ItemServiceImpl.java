@@ -43,7 +43,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public void deleteItem(long id) {
-        checkId(id);
         itemRepository.deleteById(id);
     }
 
@@ -65,7 +64,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public ItemDto updateItem(long userId, ItemDto itemDto, long itemId) {
-        checkId(itemId);
         checkUser(userId);
 
         Item itemFromRep = itemRepository.findById(itemId)
@@ -101,7 +99,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemDtoDated getItemById(long userId, long itemId) {
-        checkId(itemId);
         checkUser(userId);
 
         Item item = itemRepository.findById(itemId)
@@ -171,8 +168,6 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     @Override
     public CommentDtoOut saveComment(long userId, long itemId, CommentDtoIn commentDto) {
-        checkId(itemId);
-
         User user = checkUser(userId);
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Предмета с ID " + itemId + " не зарегистрировано"));
@@ -188,14 +183,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     private User checkUser(long userId) {
-        checkId(userId);
         return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с ID " + userId + " не зарегистрирован"));
-    }
-
-    private void checkId(long userId) {
-        if (userId <= 0) {
-            throw new BadParameterException("id must be positive");
-        }
     }
 }

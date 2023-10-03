@@ -18,6 +18,4 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     List<Item> findAllItemsByUserIdOrderById(Long userId, Pageable page);
 
     List<Item> findAllByRequestIdInOrderById(List<Long> itemRequestIds);
-
-    List<Item> findAllByRequestUserIdNotAndRequestIdInOrderById(Long userId, List<Long> requestsIds);
 }
