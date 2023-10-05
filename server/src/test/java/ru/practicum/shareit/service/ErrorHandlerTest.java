@@ -4,8 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.practicum.shareit.exception.*;
 
-import javax.validation.ConstraintViolationException;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -52,15 +50,6 @@ class ErrorHandlerTest {
     void shouldCallHandleOtherExc() {
         String message = "Ошибка сервера";
         Throwable exc = new Throwable(message);
-
-        ErrorResponse errorResponse = errorHandler.handleOtherExc(exc);
-
-        assertNotNull(errorResponse.getError());
-    }
-
-    @Test
-    void shouldCallHandleConstraintViolationExc() {
-        ConstraintViolationException exc = new ConstraintViolationException(null);
 
         ErrorResponse errorResponse = errorHandler.handleOtherExc(exc);
 

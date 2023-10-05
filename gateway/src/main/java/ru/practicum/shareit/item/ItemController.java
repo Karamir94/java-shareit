@@ -2,7 +2,9 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDtoIn;
@@ -12,12 +14,13 @@ import ru.practicum.shareit.service.Update;
 
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Positive;
+import java.util.List;
 
 import static ru.practicum.shareit.service.Header.USER_ID;
 
 @Slf4j
 @RequiredArgsConstructor
-@RestController
+@Controller
 @Validated
 @RequestMapping("/items")
 public class ItemController {
@@ -46,6 +49,9 @@ public class ItemController {
                                          @RequestParam(defaultValue = "20") @Positive int size) {
         log.info("В метод search передан userId {}, text: '{}', индекс первого элемента {}, количество элементов на " +
                 "странице {}", userId, text, from, size);
+        if (text.isBlank()) {
+            return new ResponseEntity<>(List.of(), HttpStatus.OK);
+        }
         return itemClient.search(userId, text, from, size);
     }
 
@@ -78,8 +84,8 @@ public class ItemController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteItem(@PathVariable long id) {
+    public ResponseEntity<Object> deleteItem(@PathVariable long id) {
         log.info("В метод deleteItem передан id {}", id);
-        itemClient.deleteItem(id);
+        return itemClient.deleteItem(id);
     }
 }

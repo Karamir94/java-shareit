@@ -86,10 +86,6 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> search(String text, int from, int size) {
-        if (text.isBlank()) {
-            return List.of();
-        }
-
         Pageable page = PageRequest.of(from / size, size);
         List<Item> itemsList = itemRepository.findByNameOrDescription(text, page);
         return itemsList.stream()

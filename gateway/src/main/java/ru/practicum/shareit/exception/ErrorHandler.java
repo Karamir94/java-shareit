@@ -15,20 +15,6 @@ import java.io.StringWriter;
 @Slf4j
 public class ErrorHandler {
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ErrorResponse handleNotFoundException(final NotFoundException e) {
-        log.info("404 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleAlreadyExistException(final AlreadyExistException e) {
-        log.info("409 {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
-    }
-
     @ExceptionHandler({BadParameterException.class, MethodArgumentNotValidException.class,
             ConstraintViolationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
